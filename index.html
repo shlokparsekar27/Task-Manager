@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notes</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Show input area and hide Add Task button
+      $(".btn").click(function () {
+        $(".input-area").slideDown();
+        $(this).hide();
+        $("#noteInput").focus();
+      });
+
+      // Function to add a note
+      function addNote(noteText = "") {
+        $(".notes").append(`
+          <li class="note-item">
+            <input type="checkbox" class="note-check">
+            <span>${noteText}</span>
+            <button class="edit-btn">Edit</button> <!-- Edit Button -->
+            <button class="delete-btn"><img src="images/bin.png" alt="Delete"></button>
+          </li>
+        `);
+      }
+
+      // Add button: just adds note
+      $("#addNote").click(function () {
+        addNote($("#noteInput").val());
+        $("#noteInput").val("");
+      });
+
+      // Done button: adds note, hides input, shows Add Task
+      $("#doneNote").click(function () {
+        addNote($("#noteInput").val());
+        $(".input-area").slideUp();
+        $(".btn").show(); // Show "Add Task" button again
+        $("#noteInput").val(""); // Clear input after saving
+      });
+
+      // Edit button functionality
+      $(document).on("click", ".edit-btn", function () {
+        var noteText = $(this).siblings("span").text(); // Get the text of the note
+        $("#noteInput").val(noteText); // Set the text in the input box
+        $(".input-area").slideDown(); // Show the input area
+        $(".btn").hide(); // Hide the "Add Task" button
+        $("#doneNote").show(); // Show the Done button
+        $(this).parent().hide(); // Hide the edit and delete buttons temporarily
+      });
+
+      // Delete note
+      $(document).on("click", ".delete-btn", function () {
+        $(this).parent().remove();
+
+        // If no notes left, show "Add Task" again
+        if ($(".note-item").length === 0) {
+          $(".btn").show();
+        }
+      });
+
+      // Done editing and update the note
+      $("#doneNote").click(function () {
+        var updatedText = $("#noteInput").val().trim();
+        if (updatedText !== "") {
+          $(".notes .note-item").each(function () {
+            var noteText = $(this).find("span").text();
+            if (noteText === updatedText) {
+              $(this).find("span").text(updatedText);
+              $(".input-area").slideUp();
+              $(".btn").show(); // Show "Add Task" button again
+              $("#noteInput").val(""); // Clear input after saving
+            }
+          });
+        }
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <h1><img src="images/noteslogo.png" alt="logo" />Task Manager</h1>
+
+    <button class="btn">Add Task</button>
+
+    <!-- Input Box -->
+    <div class="input-area" style="display: none;">
+      <textarea id="noteInput" placeholder="Write your note..."></textarea>
+      <div class="btn-group">
+        <button id="doneNote">Done</button>
+        <button id="addNote">Add</button>
+      </div>
+    </div>
+
+    <ul class="notes"></ul>
+  </div>
+</body>
+
+</html>
